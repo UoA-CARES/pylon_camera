@@ -50,7 +50,7 @@ int main(int argc, char** argv){
   std::string camera_left;
   if(nh_private.hasParam(CARES::Pylon::CAMERA_LEFT_S))
     nh_private.getParam(CARES::Pylon::CAMERA_LEFT_S, camera_left);
-  Camera left_camera(camera_left, false);
+  Camera left_camera(camera_left, true);
 
   image_transport::Publisher pub_left_image = it.advertise(camera_left+"/image_raw", 1);
   ros::Publisher pub_left_info = nh.advertise<sensor_msgs::CameraInfo>(camera_left+"/camera_info", 100);
@@ -59,7 +59,7 @@ int main(int argc, char** argv){
   std::string camera_right;
   if(nh_private.hasParam(CARES::Pylon::CAMERA_RIGHT_S))
     nh_private.getParam(CARES::Pylon::CAMERA_RIGHT_S, camera_right);
-  Camera right_camera(camera_right, true);
+  Camera right_camera(camera_right, false);
 
   image_transport::Publisher pub_right_image = it.advertise(camera_right+"/image_raw", 1);
   ros::Publisher pub_right_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right+"/camera_info", 100);
