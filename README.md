@@ -61,6 +61,8 @@ Pin 5 is 12 o'clock with USB input at 6 o'clock, numbers then rotate clockwise.
   Pin 1 -> Line 3 : Dcon Input
 ```
 
+![Alt text](docs/basler-pin-out.png?raw=true "Pin-out")
+
 ## Applications
 
 ### Pylon Stereo Node
