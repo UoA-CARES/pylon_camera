@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen">
+    	<param name ="camera_left"    value="left"/>
+		<param name ="camera_right"   value="right"/>
+    </node>
+</launch>
