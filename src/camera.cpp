@@ -101,6 +101,34 @@ void Camera::trigger(){
   this->camera.ExecuteSoftwareTrigger();
 }
 
+int Camera::getBinningX() {
+  return this->camera.BinningHorizontal.GetMax();
+}
+
+int Camera::getBinningY() {
+  return this->camera.BinningVertical.GetMax();
+}
+
+int Camera::getOffsetX() {
+  return this->camera.OffsetX.GetMax();
+}
+
+int Camera::getOffsetY() {
+  return this->camera.OffsetY.GetMax();
+}
+
+int Camera::getImageWidth() {
+  return this->camera.Width.GetMax();
+}
+
+int Camera::getImageHeight() {
+  return this->camera.Height.GetMax();
+}
+
+std::string Camera::name() {
+  return this->name();
+}
+
 // std_msgs::Header softwareTrigger(Camera_t *camera){
 //   int exitCode = 0;
 //   std_msgs::Header header;

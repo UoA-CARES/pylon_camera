@@ -44,6 +44,15 @@ class Camera{
 
       this->camera.AcquisitionStart.Execute();
     }
+
+    std::string name();
+    int getBinningX();
+    int getBinningY();
+    int getOffsetX();
+    int getOffsetY();
+    int getImageWidth();
+    int getImageHeight();
+
 };
 
 #endif
