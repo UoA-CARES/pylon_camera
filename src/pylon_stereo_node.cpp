@@ -26,17 +26,19 @@ void setCameraInfo(Camera camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::
   camera_info.height = image_size.at<double>(0,1);
 
 //  std::vector<double> D_v = D.isContinuous() ? D : D.clone();
-//  boost::array<double, 9> K_v = K.isContinuous()? K.data : K.clone();
-//  boost::array<double, 12> P_v = P.isContinuous()? P.data : P.clone();
-//  boost::array<double, 9> R_v = R.isContinuous()? R.data : R.clone();
+  boost::array<double, 9> K_v = K.isContinuous()? K.data : K.clone();
+  boost::array<double, 12> P_v = P.isContinuous()? P.data : P.clone();
+  boost::array<double, 9> R_v = R.isContinuous()? R.data : R.clone();
 
   //Intrinsic parameters
   camera_info.D = D;//dist
 
-  camera_info.K.elems = (double[])K.data;//K camera matrix
-  camera_info.P.elems = (double[])P.data;//P
-  camera_info.R.elems = (double[])R.data;//R
-
+  //camera_info.K.elems = (double[])K.data;//K camera matrix
+  //camera_info.P.elems = (double[])P.data;//P
+  //camera_info.R.elems = (double[])R.data;//R
+  for (int i=0; i<K_v.size(); i++)camera_info.K[i] = (K_v[i]);
+  for (int i=0; i<P_v.size(); i++)camera_info.P[i] = (P_v[i]);
+  for (int i=0; i<R_v.size(); i++)camera_info.R[i] = (R_v[i]);
   //Default is plump bob
   //TODO add this to calibration file and read from there
   camera_info.distortion_model = "plumb_bob";
@@ -54,7 +56,7 @@ void setCameraInfo(Camera camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::
   roi.x_offset   = camera.getOffsetX();
   roi.y_offset   = camera.getOffsetY();
   //If the size of the image being published is not the same as the calibration image size then recalibration is required
-  roi.do_rectify = camera_info.width != camera.getImageWidth() || camera_info.height != camera.getImageHeight());
+  roi.do_rectify = camera_info.width != camera.getImageWidth() || camera_info.height != camera.getImageHeight();
   camera_info.roi = roi;
 }
 
@@ -111,10 +113,12 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera camera_left, Camera camera_ri
   std::vector<double> T_v = R.isContinuous()? R : R.clone();
 
   stereo_camera_info.header.frame_id = camera_left.name();
-  stereo_camera_info.Q.elems = Q_v.data();
-  stereo_camera_info.R_left_right.elems = R_v.data();
-  stereo_camera_info.T_left_right.elems = T_v.data();
-
+  //stereo_camera_info.Q.elems = Q_v.data();
+  //stereo_camera_info.R_left_right.elems = R_v.data();
+  //stereo_camera_info.T_left_right.elems = T_v.data();
+  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
+  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
+  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
   return stereo_camera_info;
 }
 
