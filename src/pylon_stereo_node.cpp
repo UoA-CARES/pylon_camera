@@ -60,6 +60,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   cares_msgs::StereoCameraInfo stereo_camera_info;
 
   //Load camera info from "config" folder here
+  ROS_INFO("Loading stereo information - %s", calibration_file.c_str());
   cv::FileStorage fs(calibration_file, cv::FileStorage::READ);
   if(!fs.isOpened()) {
     ROS_ERROR("Failed to open file: %s - please check file location", calibration_file.c_str());
@@ -68,6 +69,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
 
   cv::Mat image_size;
   fs["imageSize"] >> image_size;
+
   //Left parameters
   cv::Mat K1;
   cv::Mat D1;
@@ -77,6 +79,9 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   fs["dist1"] >> D1;
   fs["P1"] >> P1;
   fs["R1"] >> R1;
+  sensor_msgs::CameraInfo left_info;
+  setCameraInfo(camera_left, image_size, K1, D1, P1, R1, left_info);
+  stereo_camera_info.left_info  = left_info;
 
   //Right parameters
   cv::Mat K2;
@@ -87,6 +92,9 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   fs["dist2"] >> D2;
   fs["P2"] >> P2;
   fs["R2"] >> R2;
+  sensor_msgs::CameraInfo right_info;
+  setCameraInfo(camera_right, image_size, K2, D2, P2, R2, right_info);
+  stereo_camera_info.right_info = right_info;
 
   //Stereo parameters
   cv::Mat Q;
@@ -95,15 +103,6 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   fs["Q"] >> Q;
   fs["R"] >> R;
   fs["T"] >> T;
-
-  sensor_msgs::CameraInfo left_info;
-  setCameraInfo(camera_left, image_size, K1, D1, P1, R1, left_info);
-  stereo_camera_info.left_info  = left_info;
-
-  sensor_msgs::CameraInfo right_info;
-  setCameraInfo(camera_right, image_size, K2, D2, P2, R2, right_info);
-  stereo_camera_info.right_info = right_info;
-
   std::vector<double>Q_v(Q.begin<double>(), Q.end<double>());
   std::vector<double>R_v(R.begin<double>(), R.end<double>());
   std::vector<double>T_v(T.begin<double>(), T.end<double>());

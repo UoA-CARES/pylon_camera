@@ -126,7 +126,7 @@ int Camera::getImageHeight() {
 }
 
 std::string Camera::name() {
-  return this->name();
+  return this->camera_name;
 }
 
 // std_msgs::Header softwareTrigger(Camera_t *camera){
