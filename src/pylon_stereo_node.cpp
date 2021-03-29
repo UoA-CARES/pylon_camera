@@ -17,7 +17,7 @@
 
 using namespace cv_bridge;
 
-void setCameraInfo(Camera camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info){
+void setCameraInfo(Camera &camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info){
   //Frame ID is named after the camera name
   camera_info.header.frame_id = camera.name();
 
@@ -25,20 +25,16 @@ void setCameraInfo(Camera camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::
   camera_info.width  = image_size.at<double>(0,0);
   camera_info.height = image_size.at<double>(0,1);
 
-//  std::vector<double> D_v = D.isContinuous() ? D : D.clone();
-  boost::array<double, 9> K_v = K.isContinuous()? K.data : K.clone();
-  boost::array<double, 12> P_v = P.isContinuous()? P.data : P.clone();
-  boost::array<double, 9> R_v = R.isContinuous()? R.data : R.clone();
+  std::vector<double>K_v(K.begin<double>(), K.end<double>());
+  std::vector<double>P_v(P.begin<double>(), P.end<double>());
+  std::vector<double>R_v(R.begin<double>(), R.end<double>());
 
   //Intrinsic parameters
   camera_info.D = D;//dist
-
-  //camera_info.K.elems = (double[])K.data;//K camera matrix
-  //camera_info.P.elems = (double[])P.data;//P
-  //camera_info.R.elems = (double[])R.data;//R
   for (int i=0; i<K_v.size(); i++)camera_info.K[i] = (K_v[i]);
   for (int i=0; i<P_v.size(); i++)camera_info.P[i] = (P_v[i]);
   for (int i=0; i<R_v.size(); i++)camera_info.R[i] = (R_v[i]);
+
   //Default is plump bob
   //TODO add this to calibration file and read from there
   camera_info.distortion_model = "plumb_bob";
@@ -60,7 +56,7 @@ void setCameraInfo(Camera camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::
   camera_info.roi = roi;
 }
 
-cares_msgs::StereoCameraInfo loadCameraInfo(Camera camera_left, Camera camera_right, std::string calibration_file){
+cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_right, std::string calibration_file){
   cares_msgs::StereoCameraInfo stereo_camera_info;
 
   //Load camera info from "config" folder here
@@ -108,17 +104,14 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera camera_left, Camera camera_ri
   setCameraInfo(camera_right, image_size, K2, D2, P2, R2, right_info);
   stereo_camera_info.right_info = right_info;
 
-  std::vector<double> Q_v = R.isContinuous()? R : R.clone();
-  std::vector<double> R_v = R.isContinuous()? R : R.clone();
-  std::vector<double> T_v = R.isContinuous()? R : R.clone();
+  std::vector<double>Q_v(Q.begin<double>(), Q.end<double>());
+  std::vector<double>R_v(R.begin<double>(), R.end<double>());
+  std::vector<double>T_v(T.begin<double>(), T.end<double>());
 
   stereo_camera_info.header.frame_id = camera_left.name();
-  //stereo_camera_info.Q.elems = Q_v.data();
-  //stereo_camera_info.R_left_right.elems = R_v.data();
-  //stereo_camera_info.T_left_right.elems = T_v.data();
   for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
-  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
-  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
+  for (int i=0; i<R_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
+  for (int i=0; i<T_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
   return stereo_camera_info;
 }
 

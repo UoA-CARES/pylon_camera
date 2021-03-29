@@ -70,7 +70,6 @@ Pin 5 is 12 o'clock with USB input at 6 o'clock, numbers then rotate clockwise.
 This node will run two basler cameras with given names (default left/right) in a stereo pair with the exposure sync mode.
 
 ##### Pylon Camera Exposure Sync
-
 When the left camera is ready to capture (ready to expose) a pin is set high triggering the right camera.\
 Similar to the hardware trigger but the cameras are capturing continuously and self triggering.
 
@@ -82,38 +81,43 @@ Triggering pin is Pin 1 -> Line 3 on the left camera.
 No Subscribed topics
 
 ##### Published Topics
-Topic names are all default names (left/right), they can be changed via setting parameters in the launch file.
+Topic names are all default names (left/right), they can be changed via setting parameters in the launch file and refer to the name of the camera.
 
 * Image
   * left/image_raw
   * right/image_raw
+
+If a calibration file is provided then these topics will be published as well.
+
 * sensor_msgs::CameraInfo
   * left/camera_info
   * right/camera_info
 * cares_msgs/StereoCameraInfo
   * left_right/stereo_info
 
-###### pylon_camera_node_exposure.launch
+###### pylon_camera_node_calibrated.launch
 Run using launch file as below.
 
 ```
-roslaunch pylon_camera pylon_camera_node_exposure.launch
+roslaunch pylon_camera pylon_camera_node_calibrated.launch
 ```
 
-Launch file can change the name of the left and right cameras, default is cameras named "left" and "right".
+Launch file can change the name of the left and right stereo cameras, default is cameras named "left" and "right" (set via pylonviewver).
+If calibration is empty the node will not publish camera or stereo information.
 
 ```xml
 <?xml version="1.0"?>
 <launch>
     <arg name="camera_left"  default="left"/>
     <arg name="camera_right" default="right"/>
+    <arg name="calibration"  default="$(find pylon_camera)/config/calibration_opencv.json"/>
 
     <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen">
-    	<param name ="camera_left"    value="$(camera_left)"/>
-		<param name ="camera_right"   value="$(camera_right)"/>
+    	<param name ="camera_left"  value="$(arg camera_left)"/>
+		<param name ="camera_right" value="$(arg camera_right)"/>
+        <param name ="calibration"  value="$(arg calibration)"/>
     </node>
 </launch>
-
 ```
 
 ## Version

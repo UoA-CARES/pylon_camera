@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="camera_left"  default="left"/>
+    <arg name="camera_right" default="right"/>
+    <arg name="calibration"  default=""/>
+
+    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen">
+    	<param name ="camera_left"  value="$(arg camera_left)"/>
+		<param name ="camera_right" value="$(arg camera_right)"/>
+        <param name ="calibration"  value="$(arg calibration)"/>
+    </node>
+</launch>
