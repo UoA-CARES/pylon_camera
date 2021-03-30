@@ -149,7 +149,8 @@ int main(int argc, char** argv){
   std::string calibration_file = "";
   if(nh_private.hasParam(CARES::Pylon::CALIBRATION_S)) {
     nh_private.getParam(CARES::Pylon::CALIBRATION_S, calibration_file);
-
+  }
+  if(calibration_file != ""){
     pub_left_info = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name + "/camera_info", 100);
     pub_right_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right_name + "/camera_info", 100);
 
