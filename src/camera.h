@@ -32,13 +32,13 @@ class Camera{
   public:
     Camera(std::string camera_name, bool master=false){
       this->camera_name = camera_name;
-//      this->createCamera(this->camera, this->camera_name.c_str());
-//      if(master)
-//        this->setMasterTrigger();
-//      else
-//        this->setSlaveTrigger();
-//
-//      this->camera.AcquisitionStart.Execute();
+      this->createCamera(this->camera, this->camera_name.c_str());
+      if(master)
+        this->setMasterTrigger();
+      else
+        this->setSlaveTrigger();
+
+      this->camera.AcquisitionStart.Execute();
     }
 
     cv::Mat getImage(int timeout=1000);
