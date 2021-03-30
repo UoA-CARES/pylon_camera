@@ -24,9 +24,8 @@ cv::Mat Camera::getImage(int time_out){
 }
 
 
-void Camera::setSlaveTrigger() {
-  try
-  {
+void Camera::setExposureTrigger() {
+  try {
     //Set pin that will trigger the camera
     this->camera.TriggerMode.SetValue(TriggerMode_On);
     this->camera.TriggerSource.SetValue(TriggerSource_Line3);
@@ -38,17 +37,15 @@ void Camera::setSlaveTrigger() {
     //Set camera to start grabbing
     this->camera.StartGrabbing();
   }
-  catch (const GenericException &e)
-  {
+  catch (const GenericException &e) {
     ROS_ERROR("Camera crashed! %s", e.GetDescription());
     exit(1);
   }
   return;
 }
 
-void Camera::setMasterTrigger() {
-  try
-  {
+void Camera::setExposureMaster() {
+  try {
     //Set exposure pin to go high when ready
     this->camera.LineSelector.SetValue(LineSelector_Line3);
     this->camera.LineMode.SetValue(LineMode_Output);
@@ -66,13 +63,37 @@ void Camera::setMasterTrigger() {
     //Set camera to start grabbing
     this->camera.StartGrabbing();
   }
-  catch (const GenericException &e)
-  {
+  catch (const GenericException &e) {
     ROS_ERROR("Camera crashed! %s", e.GetDescription());
 
     exit(1);
   }
   return;
+}
+
+void Camera::setPinTrigger() {
+  try {
+    //Set GPIO line two to take input for the camera.
+    this->camera.LineSelector.SetValue(LineSelector_Line3);
+    this->camera.LineMode.SetValue(LineMode_Input);
+    this->camera.AcquisitionMode.SetValue(AcquisitionMode_Continuous);
+    // Set the trigger mode to On
+    this->camera.TriggerMode.SetValue(TriggerMode_On);
+    //Set the line source for the hardware trigger to be GPIO line two
+    this->camera.TriggerSource.SetValue(TriggerSource_Line3);
+    //Set trigger on rising edge
+    this->camera.TriggerActivation.SetValue(TriggerActivation_RisingEdge);
+    this->camera.ExposureMode.SetValue(ExposureMode_Timed);
+    // Set the exposure time
+    //camera->ExposureTime.SetValue(400.0);
+
+    //Set camera to start grabbing
+    this->camera.StartGrabbing();
+  }
+  catch (const GenericException &e){
+    ROS_ERROR("Camera crashed! %s", e.GetDescription());
+    exit(1);
+  }
 }
 
 void Camera::createCamera(Camera_t &current_camera, String_t camera_name){
@@ -97,8 +118,51 @@ void Camera::createCamera(Camera_t &current_camera, String_t camera_name){
   current_camera.Open();
 }
 
+void Camera::toggleTriggerPin(){
+  try {
+    //Use lineselector to select a GPIO port.
+    this->camera.LineSelector.SetValue(LineSelector_Line4);
+    //Use linemode to set the GPIO port to input or output
+    this->camera.LineMode.SetValue(LineMode_Output);
+    // Use the line source to choose a UserOutput channel (essentially connecting a Line (GPIO port) to a UserOutput channel).
+    this->camera.LineSource.SetValue(LineSource_UserOutput3);
+    //Use the UserOutputSelector to select the userOutput channel selected above
+    this->camera.UserOutputSelector.SetValue(UserOutputSelector_UserOutput3);
+    //Set the value of the user output channel. True and false enable a rising edge.
+    if(this->camera.LineStatus.GetValue()){
+      //Need to set high and low otherwise get caught in a loop waiting for the camera to retrieve the result
+      this->camera.UserOutputValue.SetValue(false);
+      usleep(10);
+      this->camera.UserOutputValue.SetValue(true);
+      usleep(10);
+      this->camera.UserOutputValue.SetValue(false);
+    }else if (!this->camera.LineStatus.GetValue()){
+      this->camera.UserOutputValue.SetValue(true);
+      usleep(10);
+      this->camera.UserOutputValue.SetValue(false);
+    }
+  }
+  catch (const GenericException &e) {
+    ROS_ERROR("Error: %s", e.GetDescription());
+    PylonTerminate();
+    exit(1);
+  }
+}
+
 void Camera::trigger(){
-  this->camera.ExecuteSoftwareTrigger();
+  switch(this->trigger_mode) {
+    case TRIGGER_MODE_ASYNC:
+      this->camera.ExecuteSoftwareTrigger();
+      break;
+    case TRIGGER_MODE_EXPOSURE:
+      if(this->master)
+        this->camera.ExecuteSoftwareTrigger();
+      break;
+    case TRIGGER_MODE_PIN:
+      if(this->master)
+        this->toggleTriggerPin();
+      break;
+  }
 }
 
 int Camera::getBinningX() {
@@ -128,87 +192,3 @@ int Camera::getImageHeight() {
 std::string Camera::name() {
   return this->camera_name;
 }
-
-// std_msgs::Header softwareTrigger(Camera_t *camera){
-//   int exitCode = 0;
-//   std_msgs::Header header;
-//   try
-//   {
-//     //Use lineselector to select a GPIO port.
-//     camera->LineSelector.SetValue(LineSelector_Line4);
-//     //Use linemode to set the GPIO port to input or output
-//     camera->LineMode.SetValue(LineMode_Output);
-//     // Use the line source to choose a UserOutput channel (essentially connecting a Line (GPIO port) to a UserOutput channel).
-//     camera->LineSource.SetValue(LineSource_UserOutput3);
-//     //Use the UserOutputSelector to select the userOutput channel selected above
-//     camera->UserOutputSelector.SetValue(UserOutputSelector_UserOutput3);
-//     //Set the value of the user output channel. True and false enable a rising edge.
-//     if(camera->LineStatus.GetValue()){
-//       //Need to set high and low otherwise get caught in a loop waiting for the camera to retrieve the result
-//       camera->UserOutputValue.SetValue(false);
-//       usleep(10);
-//       header.stamp = ros::Time::now();
-//       camera->UserOutputValue.SetValue(true);
-//       usleep(10);
-//       camera->UserOutputValue.SetValue(false);
-//     }else if (!camera->LineStatus.GetValue()){
-//       header.stamp = ros::Time::now();
-//       camera->UserOutputValue.SetValue(true);
-//       usleep(10);
-//       camera->UserOutputValue.SetValue(false);
-//     }
-//   }
-//   catch (const GenericException &e)
-//   {
-//     ROS_ERROR("Error: %s", e.GetDescription());
-//     exitCode = 1;
-//     PylonTerminate();
-//     exit(exitCode);
-//   }
-//   return header;
-// }
-
-// void Camera::setSlaveTrigger(){
-//   try{
-//     //Set pin that will trigger the camera
-//     this->camera.TriggerMode.SetValue(TriggerMode_On);
-//     this->camera.TriggerSource.SetValue(TriggerSource_Line3);
-
-//     //Set exposure mode
-//     this->camera.ExposureMode.SetValue(ExposureMode_Timed);
-//     //camera->ExposureTime.SetValue(400.0);
-
-//     //Set camera to start grabbing
-//     this->camera.StartGrabbing();
-//   }
-//   catch (const GenericException &e){
-//     ROS_ERROR("Camera crashed! %s", e.GetDescription());
-
-//     exit(1);
-//   }
-// }
-
-// void Camera::setMasterTrigger(){
-//   try{
-//     //Set exposure pin to go high when ready
-//     this->camera.LineSelector.SetValue(LineSelector_Line3);
-//     this->camera.LineMode.SetValue(LineMode_Output);
-//     this->camera.LineSource.SetValue(LineSource_ExposureActive);
-
-//     //Set software trigger to fire camera
-//     this->camera.AcquisitionMode.SetValue(AcquisitionMode_Continuous);
-//     this->camera.TriggerMode.SetValue(TriggerMode_On);
-//     this->camera.TriggerSource.SetValue(TriggerSource_Software);
-
-//     //Set exposure mode
-//     this->camera.ExposureMode.SetValue(ExposureMode_Timed);
-//     //camera->ExposureTime.SetValue(400.0);
-
-//     //Set camera to start grabbing
-//     this->camera.StartGrabbing();
-//   }
-//   catch (const GenericException &e){
-//     ROS_ERROR("Camera crashed! %s", e.GetDescription());
-//     exit(1);
-//   }
-// }

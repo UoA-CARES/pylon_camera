@@ -64,6 +64,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   cv::FileStorage fs(calibration_file, cv::FileStorage::READ);
   if(!fs.isOpened()) {
     ROS_ERROR("Failed to open file: %s - please check file location", calibration_file.c_str());
+    PylonTerminate();
     exit(1);
   }
 
@@ -123,17 +124,31 @@ int main(int argc, char** argv){
   PylonInitialize();
 
   ROS_INFO("Setting up cameras");
+  bool display = true;
+  if(nh_private.hasParam(CARES::Pylon::DISPLAYP_B)){
+    nh_private.getParam(CARES::Pylon::DISPLAYP_B, display);
+  }
+
+  //Get trigger mode
+  Camera::TriggerMode trigger_mode;
+  if(nh_private.hasParam(CARES::Pylon::TRIGGER_MODE_I)){
+    int mode;
+    nh_private.getParam(CARES::Pylon::TRIGGER_MODE_I, mode);
+    trigger_mode = static_cast<Camera::TriggerMode >(mode);
+  }
+  ROS_INFO("Trigger Mode: %i", trigger_mode);
+
   //Left Camera
   std::string camera_left_name;
   if(nh_private.hasParam(CARES::Pylon::CAMERA_LEFT_S))
     nh_private.getParam(CARES::Pylon::CAMERA_LEFT_S, camera_left_name);
-  Camera camera_left(camera_left_name, true);
+  Camera camera_left(camera_left_name, trigger_mode, true);
 
   //Right Camera
   std::string camera_right_name;
   if(nh_private.hasParam(CARES::Pylon::CAMERA_RIGHT_S))
     nh_private.getParam(CARES::Pylon::CAMERA_RIGHT_S, camera_right_name);
-  Camera camera_right(camera_right_name, false);
+  Camera camera_right(camera_right_name, trigger_mode, false);
 
   //Setup publishers
   image_transport::ImageTransport it(nh);
@@ -171,11 +186,24 @@ int main(int argc, char** argv){
   while(ros::ok()){
     //Fire trigger pin on master camera
     ros::Time stamp_trigger = ros::Time::now();
+    camera_left.trigger();
     camera_right.trigger();
 
     //Get images
     cv::Mat image_left  = camera_left.getImage();
     cv::Mat image_right = camera_right.getImage();
+
+    if(display){
+      std::string left_window = camera_left.name();
+      cv::namedWindow(left_window, cv::WINDOW_NORMAL);
+      cv::resizeWindow(left_window, 600, 600);
+      cv::imshow(left_window, image_left);
+      std::string right_window = camera_right.name();
+      cv::namedWindow(right_window, cv::WINDOW_NORMAL);
+      cv::resizeWindow(right_window, 600, 600);
+      cv::imshow(right_window, image_right);
+      cv::waitKey(10);
+    }
 
     //Convert images to ROS messages
     std_msgs::Header header_image;

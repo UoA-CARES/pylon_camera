@@ -67,20 +67,33 @@ Pin 5 is 12 o'clock with USB input at 6 o'clock, numbers then rotate clockwise.
 
 ### Pylon Stereo Node
 
-This node will run two basler cameras with given names (default left/right) in a stereo pair with the exposure sync mode.
+This node will run two basler cameras with given names (default left/right) in a stereo pair with the desired sync mode.\
+There are three possible modes that the stereo cameras can operate in.
 
-##### Pylon Camera Exposure Sync
+#### Pylon Camera Async Mode (0)
+Asynchronous mode will run both cameras via the software triggers independently without the need for hardware synchronization.
+
+#### Pylon Camera Exposure Sync Mode (1)
 When the left camera is ready to capture (ready to expose) a pin is set high triggering the right camera.\
-Similar to the hardware trigger but the cameras are capturing continuously and self triggering.
+Similar to the Pin trigger but the cameras are capturing continuously and self triggering via the exposure pin.
 
 The trigger output on the left camera is wired into the trigger input on the right camera.\
 Trigger input is Pin 1 -> Line 3 on the right camera.\
 Triggering pin is Pin 1 -> Line 3 on the left camera.
 
-##### Subscribed Topics
+#### Pylon Camera Pin Mode (2)
+Pin mode sets a pin on each camera as an input that will trigger the cameras on a rising edge. 
+The left camera has a pin setup that can be toggled via software to trigger the capture on each camera.\
+The left camera toggles the trigger pin to trigger both cameras.
+ 
+The trigger output on the left camera is wired into the trigger input on the left and right camera.\
+Trigger input is Pin 1 -> Line 3 on the left and right camera.\
+Triggering pin is Pin 3 -> Line 4 on the left camera.
+
+#### Subscribed Topics
 No Subscribed topics
 
-##### Published Topics
+#### Published Topics
 Topic names are all default names (left/right), they can be changed via setting parameters in the launch file and refer to the name of the camera.
 
 * Image
@@ -95,29 +108,40 @@ If a calibration file is provided then these topics will be published as well.
 * cares_msgs/StereoCameraInfo
   * left_right/stereo_info
 
-###### pylon_camera_node_calibrated.launch
+##### pylon_camera_node_calibrated.launch
 Run using launch file as below.
 
 ```
 roslaunch pylon_camera pylon_camera_node_calibrated.launch
 ```
 
-Launch file can change the name of the left and right stereo cameras, default is cameras named "left" and "right" (set via pylonviewver).
-If calibration is empty the node will not publish camera or stereo information.
+Launch file can change the name of the left and right stereo cameras, default is cameras named "left" and "right" (set via pylonviewver).\
+If calibration is empty the node will not publish camera or stereo information.\
+The trigger mode can be selected with each mode, and cable setup, described above.\
+Display can be set if you wish to have OpenCV display the images as they are captured off the camera.
 
 ```xml
 <?xml version="1.0"?>
 <launch>
+    <arg name="display" default="true"/>
     <arg name="camera_left"  default="left"/>
     <arg name="camera_right" default="right"/>
+    <!--Trigger modes-->
+    <!--0 Aysnc-->
+    <!--1 Exposure Based-->
+    <!--2 Toggle Pin-->
+    <arg name="trigger_mode" default="0"/>
     <arg name="calibration"  default="$(find pylon_camera)/config/calibration_opencv.json"/>
 
     <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen">
+        <param name ="display"  value="$(arg display)"/>
     	<param name ="camera_left"  value="$(arg camera_left)"/>
 		<param name ="camera_right" value="$(arg camera_right)"/>
+        <param name ="trigger_mode"  value="$(arg trigger_mode)"/>
         <param name ="calibration"  value="$(arg calibration)"/>
     </node>
 </launch>
+
 ```
 
 ## Version
