@@ -166,11 +166,15 @@ void Camera::trigger(){
 }
 
 int Camera::getBinningX() {
-  return this->camera.BinningHorizontal.GetMax();
+  if(IsAvailable(this->camera.BinningHorizontal))
+    return this->camera.BinningHorizontal.GetValue();
+  return 0;
 }
 
 int Camera::getBinningY() {
-  return this->camera.BinningVertical.GetMax();
+  if(IsAvailable(this->camera.BinningVertical))
+    return this->camera.BinningVertical.GetValue();
+  return 0;
 }
 
 int Camera::getOffsetX() {

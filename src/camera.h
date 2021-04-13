@@ -12,9 +12,9 @@
 
 #include <pylon/PylonIncludes.h>
 #include <pylon/usb/BaslerUsbInstantCamera.h>
+
 typedef Pylon::CBaslerUsbInstantCamera Camera_t;
 using namespace Basler_UsbCameraParams;
-
 using namespace Pylon;
 
 class Camera{
@@ -44,6 +44,9 @@ class Camera{
       this->trigger_mode = trigger_mode;
       this->master = master;
       this->createCamera(this->camera, this->camera_name.c_str());
+
+//      INodeMap* pNodeMap = this->camera.GetNodeMap();
+//      this->camera.ExpertFeatureEnable.SetValue(true);
       //Set trigger configuration
       switch(this->trigger_mode){
         case TRIGGER_MODE_ASYNC:

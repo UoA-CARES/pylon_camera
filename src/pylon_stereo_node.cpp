@@ -17,13 +17,14 @@
 
 using namespace cv_bridge;
 
-void setCameraInfo(Camera &camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info){
+void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info){
   //Frame ID is named after the camera name
+  ROS_INFO("Reading name");
   camera_info.header.frame_id = camera.name();
 
   //Size of image at calibration
-  camera_info.width  = image_size.at<double>(0,0);
-  camera_info.height = image_size.at<double>(0,1);
+  camera_info.width  = image_size.width;
+  camera_info.height = image_size.height;
 
   std::vector<double>K_v(K.begin<double>(), K.end<double>());
   std::vector<double>P_v(P.begin<double>(), P.end<double>());
@@ -39,8 +40,10 @@ void setCameraInfo(Camera &camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv:
   //TODO add this to calibration file and read from there
   camera_info.distortion_model = "plumb_bob";
 
+  ROS_INFO("Reading binning");
   camera_info.binning_x = camera.getBinningX();//width
   camera_info.binning_y = camera.getBinningY();//height
+  ROS_INFO("Read binning");
 
   ///<Set the published image ROI based on the camera's internal settings - this can be different to the settings used during calibration
   //The default setting of roi (all values 0) is considered the same as full resolution (roi.width = width, roi.height = height)
@@ -56,7 +59,7 @@ void setCameraInfo(Camera &camera, cv::Mat image_size, cv::Mat K, cv::Mat D, cv:
   camera_info.roi = roi;
 }
 
-cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_right, std::string calibration_file){
+  cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_right, std::string calibration_file){
   cares_msgs::StereoCameraInfo stereo_camera_info;
 
   //Load camera info from "config" folder here
@@ -68,7 +71,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
     exit(1);
   }
 
-  cv::Mat image_size;
+  cv::Size image_size;
   fs["imageSize"] >> image_size;
 
   //Left parameters
@@ -77,7 +80,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   cv::Mat P1;
   cv::Mat R1;
   fs["K1"] >> K1;
-  fs["dist1"] >> D1;
+  fs["D1"] >> D1;
   fs["P1"] >> P1;
   fs["R1"] >> R1;
   sensor_msgs::CameraInfo left_info;
@@ -90,7 +93,7 @@ cares_msgs::StereoCameraInfo loadCameraInfo(Camera& camera_left, Camera& camera_
   cv::Mat P2;
   cv::Mat R2;
   fs["K2"] >> K2;
-  fs["dist2"] >> D2;
+  fs["D2"] >> D2;
   fs["P2"] >> P2;
   fs["R2"] >> R2;
   sensor_msgs::CameraInfo right_info;
