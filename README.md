@@ -80,7 +80,7 @@ The trigger output on the left camera is wired into the trigger input on the rig
 Trigger input is Pin 1 -> Line 3 on the right camera.\
 Triggering pin is Pin 1 -> Line 3 on the left camera.
 
-![Alt text](docs/sync-1.png?raw=true "Pin-out")
+![Alt text](docs/sync-mode-1.png?raw=true "Pin-out")
 
 #### Pylon Camera Pin Mode (2)
 Pin mode sets a pin on each camera as an input that will trigger the cameras on a rising edge. 
@@ -91,7 +91,7 @@ The trigger output on the left camera is wired into the trigger input on the lef
 Trigger input is Pin 1 -> Line 3 on the left and right camera.\
 Triggering pin is Pin 3 -> Line 4 on the left camera.
 
-![Alt text](docs/sync-2.png?raw=true "Pin-out")
+![Alt text](docs/sync-mode-2.png?raw=true "Pin-out")
 
 #### Subscribed Topics
 No Subscribed topics
