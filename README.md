@@ -77,8 +77,8 @@ When the left camera is ready to capture (ready to expose) a pin is set high tri
 Similar to the Pin trigger but the cameras are capturing continuously and self triggering via the exposure pin.
 
 The trigger output on the left camera is wired into the trigger input on the right camera.\
-Trigger input is Pin 1 -> Line 3 on the right camera.\
-Triggering pin is Pin 1 -> Line 3 on the left camera.
+Trigger input is Pin 1 on the right camera.\
+Trigger output is Pin 1 on the left camera.
 
 ![Alt text](docs/sync-mode-1.png?raw=true "Pin-out")
 
@@ -87,9 +87,9 @@ Pin mode sets a pin on each camera as an input that will trigger the cameras on 
 The left camera has a pin setup that can be toggled via software to trigger the capture on each camera.\
 The left camera toggles the trigger pin to trigger both cameras.
  
-The trigger output on the left camera is wired into the trigger input on the left and right camera.\
-Trigger input is Pin 1 -> Line 3 on the left and right camera.\
-Triggering pin is Pin 3 -> Line 4 on the left camera.
+The trigger output on the left camera is wired into the trigger input on the left and right cameras.\
+Trigger input is Pin 1 on the left and right camera.\
+Trigger output is Pin 3 on the left camera.
 
 ![Alt text](docs/sync-mode-2.png?raw=true "Pin-out")
 
