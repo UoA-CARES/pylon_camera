@@ -109,7 +109,7 @@ If a calibration file is provided then these topics will be published as well.
   * left/camera_info
   * right/camera_info
 * cares_msgs/StereoCameraInfo
-  * left_right/stereo_info
+  * stereo_info
 
 ##### pylon_camera_node_calibrated.launch
 Run using launch file as below.

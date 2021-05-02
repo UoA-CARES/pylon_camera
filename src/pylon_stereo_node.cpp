@@ -173,7 +173,7 @@ int main(int argc, char** argv){
     pub_right_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right_name + "/camera_info", 100);
 
     stereo_camera_info = loadCameraInfo(camera_left, camera_right, calibration_file);
-    pub_stereo_info = nh.advertise<cares_msgs::StereoCameraInfo>(camera_left_name + "_" + camera_right_name + "/stereo_info", 100);
+    pub_stereo_info = nh.advertise<cares_msgs::StereoCameraInfo>("stereo_info", 100);
   }else{
     ROS_WARN("No calibration file found for location: %s - will not publish camera or stereo information", calibration_file.c_str());
   }
