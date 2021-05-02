@@ -10,7 +10,7 @@
     <arg name="trigger_mode" default="1"/>
     <arg name="calibration"  default=""/>
 
-    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="stereo">
+    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="stereo_pair">
         <param name ="display"      value="$(arg display)"/>
         <param name ="camera_left"  value="$(arg camera_left)"/>
         <param name ="camera_right" value="$(arg camera_right)"/>

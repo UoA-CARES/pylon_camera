@@ -100,16 +100,16 @@ No Subscribed topics
 Topic names are all default names (left/right), they can be changed via setting parameters in the launch file and refer to the name of the camera.
 
 * Image
-  * left/image_raw
-  * right/image_raw
+  * stereo_pair/left/image_raw
+  * stereo_pair/right/image_raw
 
 If a calibration file is provided then these topics will be published as well.
 
 * sensor_msgs::CameraInfo
-  * left/camera_info
-  * right/camera_info
+  * stereo_pair/left/camera_info
+  * stereo_pair/right/camera_info
 * cares_msgs/StereoCameraInfo
-  * stereo_info
+  * stereo_pair/stereo_info
 
 ##### pylon_camera_node_calibrated.launch
 Run using launch file as below.
