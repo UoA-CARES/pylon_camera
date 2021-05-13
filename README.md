@@ -105,6 +105,9 @@ Topic names are all default names (left/right), they can be changed via setting 
 
 If a calibration file is provided then these topics will be published as well.
 
+* Image
+  * stereo_pair/left/image_rec
+  * stereo_pair/right/image_rec
 * sensor_msgs::CameraInfo
   * stereo_pair/left/camera_info
   * stereo_pair/right/camera_info
@@ -126,6 +129,7 @@ Display can be set if you wish to have OpenCV display the images as they are cap
 ```xml
 <?xml version="1.0"?>
 <launch>
+  <arg name="ns" default="stereo_pair"/>
   <arg name="loop_rate" default="5"/>
   <arg name="display" default="true"/>
   <arg name="camera_left"  default="left"/>
@@ -137,7 +141,7 @@ Display can be set if you wish to have OpenCV display the images as they are cap
   <arg name="trigger_mode" default="1"/>
   <arg name="calibration"  default="$(find pylon_camera)/config/calibration.json"/>
 
-  <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="stereo_pair">
+  <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="$(arg ns)">
     <param name ="loop_rate"    value="$(arg loop_rate)"/>
     <param name ="display"      value="$(arg display)"/>
     <param name ="camera_left"  value="$(arg camera_left)"/>
@@ -146,6 +150,7 @@ Display can be set if you wish to have OpenCV display the images as they are cap
     <param name ="calibration"  value="$(arg calibration)"/>
   </node>
 </launch>
+
 ```
 
 ## Version

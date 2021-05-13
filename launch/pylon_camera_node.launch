@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="ns" default="stereo_pair"/>
     <arg name="loop_rate" default="5"/>
     <arg name="display" default="true"/>
     <arg name="camera_left"  default="left"/>
@@ -11,7 +12,7 @@
     <arg name="trigger_mode" default="1"/>
     <arg name="calibration"  default=""/>
 
-    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="stereo_pair">
+    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="$(arg ns)">
         <param name ="loop_rate"    value="$(arg loop_rate)"/>
         <param name ="display"      value="$(arg display)"/>
         <param name ="camera_left"  value="$(arg camera_left)"/>
