@@ -10,6 +10,7 @@ namespace CARES {
         const std::string CAMERA_LEFT_S  = "camera_left";
         const std::string CAMERA_RIGHT_S = "camera_right";
         const std::string CALIBRATION_S = "calibration";
+        const std::string LOOP_RATE_I = "loop_rate";
     }
 }
 

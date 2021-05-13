@@ -126,25 +126,26 @@ Display can be set if you wish to have OpenCV display the images as they are cap
 ```xml
 <?xml version="1.0"?>
 <launch>
-    <arg name="display" default="true"/>
-    <arg name="camera_left"  default="left"/>
-    <arg name="camera_right" default="right"/>
-    <!--Trigger modes-->
-    <!--0 Aysnc-->
-    <!--1 Exposure Based-->
-    <!--2 Toggle Pin-->
-    <arg name="trigger_mode" default="0"/>
-    <arg name="calibration"  default="$(find pylon_camera)/config/calibration_opencv.json"/>
+  <arg name="loop_rate" default="5"/>
+  <arg name="display" default="true"/>
+  <arg name="camera_left"  default="left"/>
+  <arg name="camera_right" default="right"/>
+  <!--Trigger modes-->
+  <!--0 Aysnc-->
+  <!--1 Exposure Based-->
+  <!--2 Toggle Pin-->
+  <arg name="trigger_mode" default="1"/>
+  <arg name="calibration"  default="$(find pylon_camera)/config/calibration.json"/>
 
-    <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen">
-        <param name ="display"  value="$(arg display)"/>
-    	<param name ="camera_left"  value="$(arg camera_left)"/>
-		<param name ="camera_right" value="$(arg camera_right)"/>
-        <param name ="trigger_mode"  value="$(arg trigger_mode)"/>
-        <param name ="calibration"  value="$(arg calibration)"/>
-    </node>
+  <node name="pylon_stereo_node" pkg="pylon_camera" type="pylon_stereo_node" output="screen" ns="stereo_pair">
+    <param name ="loop_rate"    value="$(arg loop_rate)"/>
+    <param name ="display"      value="$(arg display)"/>
+    <param name ="camera_left"  value="$(arg camera_left)"/>
+    <param name ="camera_right" value="$(arg camera_right)"/>
+    <param name ="trigger_mode" value="$(arg trigger_mode)"/>
+    <param name ="calibration"  value="$(arg calibration)"/>
+  </node>
 </launch>
-
 ```
 
 ## Version
