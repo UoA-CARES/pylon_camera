@@ -21,7 +21,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   cv_bridge
-  image_geometry
   camera_info_manager
   image_transport
   sensor_msgs
