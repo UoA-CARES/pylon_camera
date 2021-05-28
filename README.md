@@ -13,7 +13,7 @@ What things you need to install the software and how to install them
 ```
 1) ROS Neotic - works in Melodic as well
 
-2) pylon 6.2.0 Camera Software Suite Linux ARM 64 bit: https://www.baslerweb.com/en/sales-support/downloads/software-downloads/#version=6.2.0;os=linuxx8664bit
+2) pylon 6.2.0 Camera Software Suite Linux x86 (64 Bit): https://www.baslerweb.com/en/sales-support/downloads/software-downloads/#version=6.2.0;os=linuxx8664bit
 
 3) Pull master version of cares_msgs
     a) cd ~/catkin_ws/src
