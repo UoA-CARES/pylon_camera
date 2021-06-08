@@ -17,7 +17,7 @@ cv::Mat Camera::getImage(int time_out){
     cv::Mat frame(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *)image.GetBuffer());
     frame.copyTo(cv_image);
   } else{
-    ROS_ERROR("Camera %s failed to grab!", this->camera_name.c_str());
+    ROS_ERROR("Camera %s failed to grab!", this->camera_id.c_str());
     exit(1);
   }
   return cv_image;
@@ -193,6 +193,6 @@ int Camera::getImageHeight() {
   return this->camera.Height.GetMax();
 }
 
-std::string Camera::name() {
+std::string Camera::getName() {
   return this->name;
 }

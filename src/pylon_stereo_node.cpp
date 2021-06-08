@@ -37,7 +37,7 @@ struct StereoInfo{
 void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info, std::string ns){
   //Frame ID is named after the camera name
   ROS_INFO("Reading name");
-  camera_info.header.frame_id = ns+"/"+camera.name();
+  camera_info.header.frame_id = ns+"/"+camera.getName();
 
   //Size of image at calibration
   camera_info.width  = image_size.width;
@@ -149,7 +149,7 @@ void loadCameraInfo(Camera& camera_left,
   std::vector<double>R_v(R.begin<double>(), R.end<double>());
   std::vector<double>T_v(T.begin<double>(), T.end<double>());
 
-  stereo_camera_info.header.frame_id = ns+"/"+camera_left.name();
+  stereo_camera_info.header.frame_id = ns+"/"+camera_left.getName();
   for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
   for (int i=0; i<R_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
   for (int i=0; i<T_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
@@ -259,8 +259,8 @@ int main(int argc, char** argv){
     cv::Mat image_right = camera_right.getImage();
 
     if(display){
-      std::string left_window = camera_left.name();
-      std::string right_window = camera_right.name();
+      std::string left_window = camera_left.getName();
+      std::string right_window = camera_right.getName();
       displayPairs(image_left, left_window, image_right, right_window);
     }
 
@@ -286,8 +286,8 @@ int main(int argc, char** argv){
       cv::remap(image_right, image_right_rec, right_map_1, right_map_2, CV_INTER_LINEAR);
 
       if(display){
-        std::string left_window = camera_left.name()+"_rec";
-        std::string right_window = camera_right.name()+"_rec";
+        std::string left_window = camera_left.getName()+"_rec";
+        std::string right_window = camera_right.getName()+"_rec";
         displayPairs(image_left_rec, left_window, image_right_rec, right_window);
       }
 

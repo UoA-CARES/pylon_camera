@@ -71,7 +71,7 @@ class Camera{
 
     void trigger();
 
-    std::string name();
+    std::string getName();
     int getBinningX();
     int getBinningY();
     int getOffsetX();
