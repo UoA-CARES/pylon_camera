@@ -97,17 +97,17 @@ Trigger output is Pin 3 on the left camera.
 No Subscribed topics
 
 #### Published Topics
-Topic names are all default names (left/right), they can be changed via setting parameters in the launch file and refer to the name of the camera.
+The base topic name is the default name (ns=stereo_pair), it can be changed via setting parameters in the launch file via "ns".
 
 * Image
-  * stereo_pair/left/image_raw
-  * stereo_pair/right/image_raw
+  * stereo_pair/left/image_color
+  * stereo_pair/right/image_color
 
 If a calibration file is provided then these topics will be published as well.
 
 * Image
-  * stereo_pair/left/image_rec
-  * stereo_pair/right/image_rec
+  * stereo_pair/left/image_rect_color
+  * stereo_pair/right/image_rect_color
 * sensor_msgs::CameraInfo
   * stereo_pair/left/camera_info
   * stereo_pair/right/camera_info
@@ -150,6 +150,14 @@ Display can be set if you wish to have OpenCV display the images as they are cap
     <param name ="calibration"  value="$(arg calibration)"/>
   </node>
 </launch>
+
+```
+
+Camera left and right arguements are the IDs of the cameras you wish to connect to - default is "left" and "right".
+
+```xml
+<arg name="camera_left"  default="left"/>
+<arg name="camera_right" default="right"/>
 
 ```
 
