@@ -26,7 +26,8 @@ class Camera{
 
   private:
     Camera_t camera;
-    std::string camera_name;
+    std::string camera_id;
+    std::string name;
     TriggerMode trigger_mode;
     bool master;
 
@@ -39,11 +40,12 @@ class Camera{
     void toggleTriggerPin();
 
   public:
-    Camera(std::string camera_name, TriggerMode trigger_mode, bool master=false){
-      this->camera_name = camera_name;
+    Camera(std::string camera_id, std::string name, TriggerMode trigger_mode, bool master=false){
+      this->name = name;
+      this->camera_id = camera_id;
       this->trigger_mode = trigger_mode;
       this->master = master;
-      this->createCamera(this->camera, this->camera_name.c_str());
+      this->createCamera(this->camera, this->camera_id.c_str());
 
 //      INodeMap* pNodeMap = this->camera.GetNodeMap();
 //      this->camera.ExpertFeatureEnable.SetValue(true);

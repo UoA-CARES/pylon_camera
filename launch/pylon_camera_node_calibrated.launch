@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <launch>
+    <!--Name space for the pair of stereo camera data-->
     <arg name="ns" default="stereo_pair"/>
     <arg name="loop_rate" default="5"/>
     <arg name="display" default="true"/>
+
+    <!--Name ID of the left and right cameras-->
     <arg name="camera_left"  default="left"/>
     <arg name="camera_right" default="right"/>
     <!--Trigger modes-->

@@ -188,25 +188,27 @@ int main(int argc, char** argv){
   ROS_INFO("Trigger Mode: %i", trigger_mode);
 
   //Left Camera
-  std::string camera_left_name;
-  if(!nh_private.getParam(CARES::Pylon::CAMERA_LEFT_S, camera_left_name)){
+  std::string camera_left_id;
+  if(!nh_private.getParam(CARES::Pylon::CAMERA_LEFT_S, camera_left_id)){
     ROS_ERROR((CARES::Pylon::CAMERA_LEFT_S+ " not set.").c_str());
     return 0;
   }
-  Camera camera_left(camera_left_name, trigger_mode, true);
+  std::string camera_left_name = "left";
+  Camera camera_left(camera_left_id, camera_left_name, trigger_mode, true);
 
   //Right Camera
-  std::string camera_right_name;
-  if(!nh_private.getParam(CARES::Pylon::CAMERA_RIGHT_S, camera_right_name)){
+  std::string camera_right_id;
+  if(!nh_private.getParam(CARES::Pylon::CAMERA_RIGHT_S, camera_right_id)){
     ROS_ERROR((CARES::Pylon::CAMERA_RIGHT_S+ " not set.").c_str());
     return 0;
   }
-  Camera camera_right(camera_right_name, trigger_mode, false);
+  std::string camera_right_name = "right";
+  Camera camera_right(camera_right_id, camera_right_name, trigger_mode, false);
 
   //Setup publishers
   image_transport::ImageTransport it(nh);
-  image_transport::Publisher pub_image_left  = it.advertise(camera_left_name+"/image_raw", 1);
-  image_transport::Publisher pub_image_right = it.advertise(camera_right_name+"/image_raw", 1);
+  image_transport::Publisher pub_image_left  = it.advertise(camera_left_name  + "/image_color", 1);
+  image_transport::Publisher pub_image_right = it.advertise(camera_right_name + "/image_color", 1);
   image_transport::Publisher pub_image_left_rec;
   image_transport::Publisher pub_image_right_rec;
 
@@ -222,10 +224,10 @@ int main(int argc, char** argv){
   //Load Stereo and Camera Information
   std::string calibration_file = "";
   if(nh_private.getParam(CARES::Pylon::CALIBRATION_S, calibration_file)){
-    pub_image_left_rec  = it.advertise(camera_left_name+"/image_rec", 1);
-    pub_image_right_rec = it.advertise(camera_right_name+"/image_rec", 1);
+    pub_image_left_rec  = it.advertise(camera_left_name  + "/image_rect_color", 1);
+    pub_image_right_rec = it.advertise(camera_right_name + "/image_rect_color", 1);
 
-    pub_left_info = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name + "/camera_info", 100);
+    pub_left_info = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name   + "/camera_info", 100);
     pub_right_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right_name + "/camera_info", 100);
 
     loadCameraInfo(camera_left, camera_right, calibration_file, ns, stereo_info, stereo_camera_info);
@@ -291,9 +293,9 @@ int main(int argc, char** argv){
 
       //Convert images to ROS messages
       sensor_msgs::ImagePtr msg_image_left_rec = cv_bridge::CvImage(header_image, "bgr8", image_left_rec).toImageMsg();
-      msg_image_left_rec->header.frame_id = ns+"/"+camera_left_name;
+      msg_image_left_rec->header.frame_id = ns+"/"+camera_left_name+"_optical_frame";
       sensor_msgs::ImagePtr msg_image_right_rec = cv_bridge::CvImage(header_image, "bgr8", image_right_rec).toImageMsg();
-      msg_image_right_rec->header.frame_id = ns+"/"+camera_right_name;
+      msg_image_right_rec->header.frame_id = ns+"/"+camera_right_name+"_optical_frame";
 
       pub_image_left_rec.publish(msg_image_left_rec);
       pub_image_right_rec.publish(msg_image_right_rec);

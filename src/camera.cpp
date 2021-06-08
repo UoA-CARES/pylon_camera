@@ -194,5 +194,5 @@ int Camera::getImageHeight() {
 }
 
 std::string Camera::name() {
-  return this->camera_name;
+  return this->name;
 }
