@@ -172,6 +172,7 @@ int main(int argc, char** argv){
   ros::NodeHandle nh_private("~");
 
   std::string ns = ros::this_node::getNamespace();
+  ns.erase(0,1);
   ROS_INFO("Operating under namespace: %s", ns.c_str());
   // Before using any pylon methods, the pylon runtime must be initialized
   PylonInitialize();
