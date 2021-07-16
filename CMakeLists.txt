@@ -174,7 +174,7 @@ find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(pylon_stereo_node src/pylon_stereo_node.cpp src/camera.h src/camera.cpp src/parameters.h)
-target_link_libraries(pylon_stereo_node ${catkin_LIBRARIES} ${Pylon_LIBRARIES})
+target_link_libraries(pylon_stereo_node ${catkin_LIBRARIES} ${Pylon_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(pylon_stereo_node ${catkin_EXPORTED_TARGETS})
 
 #############
