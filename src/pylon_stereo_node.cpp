@@ -37,7 +37,7 @@ struct StereoInfo{
 void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info, std::string ns){
   //Frame ID is named after the camera name
   ROS_INFO("Reading name");
-  camera_info.header.frame_id = ns+"/"+camera.getName();
+  camera_info.header.frame_id = ns+"/"+camera.getName()+"_optical_frame";
 
   //Size of image at calibration
   camera_info.width  = image_size.width;
@@ -149,7 +149,7 @@ void loadCameraInfo(Camera& camera_left,
   std::vector<double>R_v(R.begin<double>(), R.end<double>());
   std::vector<double>T_v(T.begin<double>(), T.end<double>());
 
-  stereo_camera_info.header.frame_id = ns+"/"+camera_left.getName();
+  stereo_camera_info.header.frame_id = ns+"/"+camera_left.getName()+"_optical_frame";
   for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
   for (int i=0; i<R_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
   for (int i=0; i<T_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
