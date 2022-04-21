@@ -34,9 +34,17 @@ struct StereoInfo{
     cv::Size size;
 };
 
+sensor_msgs::CameraInfo convertToRecCameraInfo(sensor_msgs::CameraInfo camera_info){
+  sensor_msgs::CameraInfo rec_camera_info = camera_info;
+  rec_camera_info.D = {0,0,0,0,0};
+  rec_camera_info.K = {camera_info.P[0], camera_info.P[1], camera_info.P[2], camera_info.P[4], camera_info.P[5], camera_info.P[6], camera_info.P[8], camera_info.P[9], camera_info.P[10]};
+  for (int i=0; i<camera_info.P.size(); i++)rec_camera_info.P[i] = camera_info.P[i];
+  rec_camera_info.R = {1,0,0,0,1,0,0,0,1};
+  return rec_camera_info;
+}
+
 void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv::Mat P, cv::Mat R, sensor_msgs::CameraInfo &camera_info, std::string ns){
   //Frame ID is named after the camera name
-  ROS_INFO("Reading name");
   camera_info.header.frame_id = ns+"/"+camera.getName()+"_optical_frame";
 
   //Size of image at calibration
@@ -57,10 +65,8 @@ void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv
   //TODO add this to calibration file and read from there
   camera_info.distortion_model = "plumb_bob";
 
-  ROS_INFO("Reading binning");
   camera_info.binning_x = camera.getBinningX();//width
   camera_info.binning_y = camera.getBinningY();//height
-  ROS_INFO("Read binning");
 
   ///<Set the published image ROI based on the camera's internal settings - this can be different to the settings used during calibration
   //The default setting of roi (all values 0) is considered the same as full resolution (roi.width = width, roi.height = height)
@@ -76,7 +82,7 @@ void setCameraInfo(Camera &camera, cv::Size image_size, cv::Mat K, cv::Mat D, cv
   camera_info.roi = roi;
 }
 
-void loadCameraInfo(Camera& camera_left,
+void loadStereoInfo(Camera& camera_left,
                     Camera& camera_right,
                     std::string calibration_file,
                     std::string ns,
@@ -149,6 +155,7 @@ void loadCameraInfo(Camera& camera_left,
   std::vector<double>R_v(R.begin<double>(), R.end<double>());
   std::vector<double>T_v(T.begin<double>(), T.end<double>());
 
+  //Calibrations are presumed to always be relative to the left frame: Future maybe flexible?
   stereo_camera_info.header.frame_id = ns+"/"+camera_left.getName()+"_optical_frame";
   for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
   for (int i=0; i<R_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
@@ -171,6 +178,7 @@ int main(int argc, char** argv){
   ros::NodeHandle nh;
   ros::NodeHandle nh_private("~");
 
+  //Load ROS parameters
   std::string ns = ros::this_node::getNamespace();
   ns.erase(0,1);
   ROS_INFO("Operating under namespace: %s", ns.c_str());
@@ -206,38 +214,50 @@ int main(int argc, char** argv){
   std::string camera_right_name = "right";
   Camera camera_right(camera_right_id, camera_right_name, trigger_mode, false);
 
-  //Setup publishers
+  //Image publishers
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub_image_left  = it.advertise(camera_left_name  + "/image_color", 1);
   image_transport::Publisher pub_image_right = it.advertise(camera_right_name + "/image_color", 1);
   image_transport::Publisher pub_image_left_rec;
   image_transport::Publisher pub_image_right_rec;
 
+  //Camera Info Publishers
   ros::Publisher pub_left_info;
+  ros::Publisher pub_left_rec_info;
   ros::Publisher pub_right_info;
+  ros::Publisher pub_right_rec_info;
   ros::Publisher pub_stereo_info;
 
-  StereoInfo stereo_info;
+  //Calibration information
   cares_msgs::StereoCameraInfo stereo_camera_info;
+  sensor_msgs::CameraInfo left_rec_info, right_rec_info;
   cv::Mat left_map_1, left_map_2;
   cv::Mat right_map_1, right_map_2;
 
   //Load Stereo and Camera Information
   std::string calibration_file = "";
-  if(nh_private.getParam(CARES::Pylon::CALIBRATION_S, calibration_file)){
+  nh_private.getParam(CARES::Pylon::CALIBRATION_S, calibration_file);
+  if(calibration_file.compare("") != 0){
     pub_image_left_rec  = it.advertise(camera_left_name  + "/image_rect_color", 1);
     pub_image_right_rec = it.advertise(camera_right_name + "/image_rect_color", 1);
 
-    pub_left_info = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name   + "/camera_info", 100);
+    pub_left_info  = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name   + "/camera_info", 100);
     pub_right_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right_name + "/camera_info", 100);
 
-    loadCameraInfo(camera_left, camera_right, calibration_file, ns, stereo_info, stereo_camera_info);
+    StereoInfo stereo_info;
+    loadStereoInfo(camera_left, camera_right, calibration_file, ns, stereo_info, stereo_camera_info);
     pub_stereo_info = nh.advertise<cares_msgs::StereoCameraInfo>("stereo_info", 100);
+
+    //TODO Determine what the rec camera_info topics should be called
+    left_rec_info = convertToRecCameraInfo(stereo_camera_info.left_info);
+    right_rec_info = convertToRecCameraInfo(stereo_camera_info.right_info);
+    pub_left_rec_info  = nh.advertise<sensor_msgs::CameraInfo>(camera_left_name  + "/rec_camera_info", 100);
+    pub_right_rec_info = nh.advertise<sensor_msgs::CameraInfo>(camera_right_name + "/rec_camera_info", 100);
 
     cv::initUndistortRectifyMap(stereo_info.left.K, stereo_info.left.D, stereo_info.left.R, stereo_info.left.P, stereo_info.size, CV_32FC1, left_map_1, left_map_2);
     cv::initUndistortRectifyMap(stereo_info.right.K, stereo_info.right.D, stereo_info.right.R, stereo_info.right.P, stereo_info.size, CV_32FC1, right_map_1, right_map_2);
   }else{
-    ROS_WARN("No calibration file found for location: %s - will not publish camera or stereo information", calibration_file.c_str());
+    ROS_WARN("No calibration file provided - will not publish camera or stereo information");
   }
 
   //Primary Loop
@@ -282,6 +302,11 @@ int main(int argc, char** argv){
       pub_right_info.publish(stereo_camera_info.right_info);
       pub_stereo_info.publish(stereo_camera_info);
 
+      left_rec_info.header.stamp = stamp_trigger;
+      right_rec_info.header.stamp = stamp_trigger;
+      pub_left_rec_info.publish(left_rec_info);
+      pub_right_rec_info.publish(right_rec_info);
+
       cv::Mat image_left_rec, image_right_rec;
       cv::remap(image_left, image_left_rec, left_map_1, left_map_2, CV_INTER_LINEAR);
       cv::remap(image_right, image_right_rec, right_map_1, right_map_2, CV_INTER_LINEAR);
@@ -303,5 +328,6 @@ int main(int argc, char** argv){
     }
     rate.sleep();
   }
+  PylonTerminate();
   return 0;
 }
