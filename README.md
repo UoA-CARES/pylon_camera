@@ -62,6 +62,17 @@ Pin 5 is 12 o'clock with USB input at 6 o'clock, numbers then rotate clockwise.
 
 ![Alt text](docs/basler-pin-out.png?raw=true "Pin-out")
 
+## Configure camera name
+```
+1) Start up pylon viwer (located at /pylon/bin/pylonviewer)
+
+2) Double click the camera in "Devices"
+
+3) In the "Features - All" tab, find "Device control" and modify the "Device User ID" to the desired name
+
+4) Still under "Device control", execute the "Device reset" and refresh the devices to see the change take effect.
+```
+
 ## Applications
 
 ### Pylon Stereo Node
