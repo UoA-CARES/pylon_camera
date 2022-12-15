@@ -79,6 +79,8 @@ class Camera{
     int getImageWidth();
     int getImageHeight();
 
+    void setAutoFunctions();
+
 };
 
 #endif

@@ -204,7 +204,7 @@ int main(int argc, char** argv){
   }
   std::string camera_left_name = "left";
   Camera camera_left(camera_left_id, camera_left_name, trigger_mode, true);
-
+  camera_left.setAutoFunctions();
   //Right Camera
   std::string camera_right_id;
   if(!nh_private.getParam(CARES::Pylon::CAMERA_RIGHT_S, camera_right_id)){
@@ -213,6 +213,7 @@ int main(int argc, char** argv){
   }
   std::string camera_right_name = "right";
   Camera camera_right(camera_right_id, camera_right_name, trigger_mode, false);
+  camera_right.setAutoFunctions();
 
   //Image publishers
   image_transport::ImageTransport it(nh);

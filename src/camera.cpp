@@ -196,3 +196,9 @@ int Camera::getImageHeight() {
 std::string Camera::getName() {
   return this->name;
 }
+
+void Camera::setAutoFunctions() {
+  this->camera.BalanceWhiteAuto.SetValue(BalanceWhiteAuto_Continuous);
+  this->camera.GainAuto.SetValue(GainAuto_Continuous);
+  this->camera.ExposureAuto.SetValue(ExposureAuto_Continuous);
+}
